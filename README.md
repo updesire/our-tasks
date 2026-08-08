@@ -1,92 +1,93 @@
 # Our Tasks
 
-اپلیکیشن ویندوزی که با یک کلید میانبر سراسری (پیش‌فرض `Ctrl+Shift+Enter`) باز می‌شود، یک فرم با دو فیلد «نام درخواست‌کننده» و «توضیحات» دارد و با زدن دکمه «ثبت»، اطلاعات را مستقیماً در یک گوگل شیت ذخیره می‌کند.
+[فارسی 🇮🇷](README.fa.md)
 
-- کلید میانبر از داخل برنامه قابل تغییر است.
-- برنامه در سیستم‌تری (کنار ساعت ویندوز) باقی می‌ماند تا کلید میانبر همیشه فعال باشد.
-- می‌توان تنظیم کرد که برنامه با روشن شدن ویندوز خودکار اجرا شود.
-- هر کاربر، یک‌بار نام خودش را در تنظیمات («اسم ثبت‌کننده») وارد می‌کند تا مشخص باشد هر ردیف را چه کسی ثبت کرده.
+A Windows app that opens with a global hotkey (default `Ctrl+Shift+Enter`), shows a form with a "Requester Name" and "Description" field, and saves the entry straight into a Google Sheet when you click Submit.
+
+- The hotkey can be changed from within the app.
+- The app stays in the system tray (next to the clock) so the hotkey is always active.
+- It can be set to launch automatically when Windows starts.
+- Each user enters their own name once in Settings ("Recorder Name") so it's clear who submitted each row.
 
 ---
 
-## ۱) ساخت مقصد در گوگل شیت (یک‌بار انجام می‌شود)
+## 1) Set up the Google Sheet destination (one-time)
 
-۱. یک Google Sheet جدید بسازید (ترجیحاً یک شیت خالی و تازه، چون ترتیب ستون‌ها مشخص است و بهتره از یک صفحهٔ خالی شروع کنید).
-۲. از منو: **Extensions → Apps Script** را باز کنید.
-۳. محتوای فایل `google-apps-script/Code.gs` (داخل همین پروژه) را کپی کرده و به‌جای کد پیش‌فرض در ادیتور Apps Script جای‌گذاری کنید.
-۴. (اختیاری) اگر می‌خواهید یک کد امنیتی ساده هم بررسی شود، مقدار `SECRET_TOKEN` را در بالای فایل پر کنید (مثلاً یک رشتهٔ تصادفی). اگر نمی‌خواهید، آن را خالی بگذارید.
-۵. روی **Deploy → New deployment** بزنید.
-   - Type را روی **Web app** بگذارید.
-   - «Execute as» را روی **Me** بگذارید.
-   - «Who has access» را روی **Anyone** بگذارید (برای اینکه اپ بدون لاگین گوگل بتواند داده بفرستد).
-   - Deploy بزنید و اجازهٔ دسترسی را تأیید کنید.
-۶. آدرس تولیدشده (چیزی شبیه `https://script.google.com/macros/s/AKfycb.../exec`) را کپی کنید — این همان «آدرس وب‌هوک» است که در تنظیمات برنامه وارد می‌شود.
+1. Create a new Google Sheet (preferably a fresh, empty one — the column order is fixed, so it's best to start clean).
+2. From the menu, open **Extensions → Apps Script**.
+3. Copy the contents of `google-apps-script/Code.gs` (in this project) and paste it in place of the default code in the Apps Script editor.
+4. (Optional) If you want a simple security check, fill in the `SECRET_TOKEN` value at the top of the file (e.g. a random string). Leave it empty if you don't need this.
+5. Click **Deploy → New deployment**.
+   - Set Type to **Web app**.
+   - Set "Execute as" to **Me**.
+   - Set "Who has access" to **Anyone** (so the app can send data without a Google login).
+   - Click Deploy and approve the permissions.
+6. Copy the generated URL (something like `https://script.google.com/macros/s/AKfycb.../exec`) — this is the "webhook URL" you'll enter in the app's settings.
 
-با اولین ثبت موفق، برنامه خودش سرستون‌ها را با این ترتیب اضافه می‌کند:
+On the first successful submission, the app automatically adds a header row in this order:
 
-| نام ثبت‌کننده | نام درخواست‌کننده | توضیحات | تاریخ | ساعت |
+| Recorder Name | Requester Name | Description | Date | Time |
 |---|---|---|---|---|
 
-> نکته مهم: اگر قبلاً یک نسخهٔ قدیمی‌تر از `Code.gs` را دیپلوی کرده بودید (با ستون‌های متفاوت مثل «کامپیوتر»)، حتماً یک **New deployment** جدید بسازید تا کد تازه اجرا شود. اگر شیت قبلی شما ستون‌های قدیمی دارد، بهتر است محتوای شیت را پاک کنید یا یک برگهٔ (Sheet) جدید بسازید تا سرستون‌ها با ترتیب جدید هماهنگ باشند.
+> Important: If you had previously deployed an older version of `Code.gs` (with different columns, like "Computer"), make sure to create a new **New deployment** so the updated code runs. If your existing sheet has old columns, it's best to clear the sheet or start a new tab so the headers match the new layout.
 
 ---
 
-## ۲) ساخت فایل نصب ویندوز (Setup.exe)
+## 2) Build the Windows installer (Setup.exe)
 
-کد این پروژه با **Electron** نوشته شده. برای گرفتن خروجی `Setup.exe`، یکی از دو روش زیر را انجام دهید:
+This project is built with **Electron**. To get a `Setup.exe`, use one of the two methods below:
 
-### روش الف) ساخت روی یک کامپیوتر ویندوزی (ساده‌ترین حالت)
+### Method A) Build it on a Windows computer (simplest)
 
-۱. [Node.js](https://nodejs.org) نسخهٔ ۱۸ به بالا را نصب کنید.
-۲. پوشهٔ این پروژه را باز کنید، در همان پوشه یک ترمینال (**Command Prompt**، نه PowerShell — تا با محدودیت اجرای اسکریپت روبه‌رو نشوید) باز کنید و بزنید:
+1. Install [Node.js](https://nodejs.org) version 18 or later.
+2. Open this project's folder, open a terminal there (**Command Prompt**, not PowerShell — to avoid script-execution restrictions) and run:
    ```
    npm install
    npm run dist
    ```
-۳. بعد از اتمام، فایل نصب در پوشهٔ `dist` با نامی شبیه `Our Tasks Setup 1.0.0.exe` ساخته می‌شود.
-۴. همین فایل را روی هر کامپیوتری که می‌خواهید کپی و اجرا (نصب) کنید.
+3. Once it finishes, the installer will be created in the `dist` folder, named something like `Our Tasks Setup 1.0.0.exe`.
+4. Copy that file to any computer you want and run it to install.
 
-### روش ب) ساخت خودکار با GitHub Actions (بدون نیاز به ویندوز)
+### Method B) Build automatically with GitHub Actions (no Windows machine needed)
 
-یک workflow آماده در مسیر `.github/workflows/build.yml` داخل پروژه قرار دارد.
+A ready-made workflow lives at `.github/workflows/build.yml`.
 
-۱. این پوشه را در یک ریپازیتوری GitHub قرار دهید (push کنید).
-۲. GitHub به‌صورت خودکار روی یک ماشین ویندوزی پروژه را می‌سازد.
-۳. از تب **Actions** همان ریپازیتوری، آخرین اجرای موفق را باز کنید و از قسمت **Artifacts**، فایل `Our-Tasks-Setup` را دانلود کنید — همان فایل نصب `.exe` است.
-
----
-
-## ۳) استفاده از برنامه
-
-- بعد از نصب، برنامه اجرا می‌شود و آیکن آن در سیستم‌تری (کنار ساعت) ظاهر می‌شود.
-- برای باز کردن پنجرهٔ فرم، کلیدهای **Ctrl+Shift+Enter** را بزنید (یا روی آیکن تری کلیک کنید).
-- بار اول که برنامه را باز می‌کنید، پنجرهٔ **تنظیمات** به‌طور خودکار باز می‌شود (چون هنوز «آدرس وب‌هوک» و «اسم ثبت‌کننده» ثبت نشده‌اند). این دو مورد را پر کنید:
-  - «آدرس وب‌هوک Google Apps Script» که در مرحلهٔ ۱ گرفتید.
-  - «اسم ثبت‌کننده» — هر کسی که از این کامپیوتر استفاده می‌کند، باید یک‌بار نام خودش را همین‌جا وارد کند. تا این فیلد پر نشود، دکمهٔ ثبت کار نمی‌کند.
-- در همان بخش تنظیمات می‌توانید:
-  - کلید میانبر را با زدن دکمهٔ «ضبط» و سپس فشردن ترکیب کلید دلخواه، تغییر دهید.
-  - کد امنیتی (در صورت تنظیم در Apps Script) را وارد کنید.
-  - اجرای خودکار برنامه هنگام روشن‌شدن ویندوز را روشن/خاموش کنید (پیش‌فرض: روشن).
-- با پر کردن «نام درخواست‌کننده» و «توضیحات» و زدن دکمهٔ «ثبت در گوگل شیت»، یک ردیف جدید به این ترتیب به شیت اضافه می‌شود:
-
-  **نام ثبت‌کننده | نام درخواست‌کننده | توضیحات | تاریخ | ساعت**
-
-  «نام ثبت‌کننده» همان مقداری است که در تنظیمات وارد کرده‌اید (نه نام کاربری ویندوز)، و «تاریخ»/«ساعت» به‌طور خودکار و جدا از هم ثبت می‌شوند.
-- بستن پنجره (×) فقط آن را مخفی می‌کند؛ برنامه در تری باقی می‌ماند. برای خروج کامل، از منوی راست‌کلیک روی آیکن تری گزینهٔ «خروج» را بزنید.
-- در پایین پنجرهٔ تنظیمات، نام توسعه‌دهنده (سوران اسمعیل‌پوری) نمایش داده می‌شود.
+1. Push this folder to a GitHub repository.
+2. GitHub will automatically build the project on a Windows machine.
+3. From the **Actions** tab of that repository, open the latest successful run and download the `Our-Tasks-Setup` file from **Artifacts** — that's your `.exe` installer.
 
 ---
 
-## ساختار پروژه
+## 3) Using the app
+
+- After installing, the app launches and its icon appears in the system tray (next to the clock).
+- Press **Ctrl+Shift+Enter** to open the form window (or click the tray icon).
+- The first time you open the app, the **Settings** window opens automatically (since the webhook URL and recorder name aren't set yet). Fill in:
+  - The **Google Apps Script webhook URL** from step 1.
+  - **Recorder Name** — anyone using this computer should enter their own name here once. The Submit button won't work until this is filled in.
+- From the same Settings panel you can also:
+  - Change the hotkey by clicking **Record** and then pressing your desired key combination.
+  - Enter the security code (if you set one in Apps Script).
+  - Turn automatic startup with Windows on/off (default: on).
+- Filling in **Requester Name** and **Description** and clicking **Submit to Google Sheet** adds a new row in this order:
+
+  **Recorder Name | Requester Name | Description | Date | Time**
+
+  "Recorder Name" is the value you entered in Settings (not your Windows username), and "Date"/"Time" are recorded automatically as two separate columns.
+- Closing the window (×) only hides it; the app stays in the tray. To fully quit, right-click the tray icon and choose **Exit**.
+- The developer's name (Soran Esmaeilpouri) is shown at the bottom of the Settings window.
+
+---
+
+## Project structure
 
 ```
 Our Tasks/
-├─ main.js                  فرآیند اصلی Electron (تری، کلید میانبر، ارسال به گوگل شیت)
-├─ preload.js                پل امن بین رابط کاربری و main.js
-├─ renderer/                 رابط کاربری (HTML/CSS/JS)
-├─ assets/                   آیکن‌های برنامه
-├─ google-apps-script/Code.gs  کدی که باید در Google Apps Script قرار گیرد
-├─ .github/workflows/build.yml  ساخت خودکار Setup.exe با GitHub Actions
+├─ main.js                  Electron main process (tray, hotkey, sends data to Google Sheets)
+├─ preload.js                Secure bridge between the UI and main.js
+├─ renderer/                 UI (HTML/CSS/JS)
+├─ assets/                   App icons
+├─ google-apps-script/Code.gs  Code to paste into Google Apps Script
+├─ .github/workflows/build.yml  Builds Setup.exe automatically via GitHub Actions
 └─ package.json
 ```
-# our-tasks
