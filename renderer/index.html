@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+<title>Our Tasks</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="app">
+    <header class="topbar">
+      <button id="settingsBtn" class="icon-btn" title="تنظیمات" aria-label="تنظیمات">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19.14 12.94a7.14 7.14 0 0 0 .06-.94 7.14 7.14 0 0 0-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54a7.3 7.3 0 0 0-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.14 7.14 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.42.32.6.22l2.39-.96c.5.4 1.05.71 1.63.94l.36 2.54c.05.24.25.42.5.42h3.84c.25 0 .45-.18.5-.42l.36-2.54a7.3 7.3 0 0 0 1.63-.94l2.39.96c.24.1.5 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5Z"/></svg>
+      </button>
+      <h1>Our Tasks</h1>
+      <span class="spacer"></span>
+    </header>
+
+    <main class="card">
+      <div class="field">
+        <label for="nameInput">نام درخواست‌کننده</label>
+        <input id="nameInput" type="text" placeholder="مثلاً: علی رضایی" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label for="descInput">توضیحات</label>
+        <textarea id="descInput" rows="6" placeholder="توضیحات را اینجا بنویسید..."></textarea>
+      </div>
+
+      <button id="submitBtn" class="primary-btn">
+        <span id="submitLabel">ثبت در گوگل شیت</span>
+        <span id="submitSpinner" class="spinner hidden"></span>
+      </button>
+
+      <p class="hint">کلید میانبر برای باز کردن این پنجره: <b id="hotkeyHint">…</b></p>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <!-- Settings panel -->
+  <div id="settingsOverlay" class="overlay hidden">
+    <div class="settings-panel">
+      <div class="settings-header">
+        <h2>تنظیمات</h2>
+        <button id="closeSettingsBtn" class="icon-btn" aria-label="بستن">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.71 2.89 18.3 9.17 12 2.89 5.71 4.3 4.3l6.29 6.29 6.29-6.29z"/></svg>
+        </button>
+      </div>
+
+      <div class="field">
+        <label for="webhookInput">آدرس وب‌هوک Google Apps Script</label>
+        <input id="webhookInput" type="text" placeholder="https://script.google.com/macros/s/AKfycb.../exec" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label for="tokenInput">کد امنیتی (اختیاری)</label>
+        <input id="tokenInput" type="text" placeholder="اختیاری" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label for="submitterInput">اسم ثبت‌کننده</label>
+        <input id="submitterInput" type="text" placeholder="نام خودتان را وارد کنید" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label>ترکیب کلید میانبر</label>
+        <div class="hotkey-row">
+          <input id="hotkeyInput" type="text" readonly placeholder="روی «ضبط» بزنید و کلیدها را فشار دهید" />
+          <button id="recordBtn" class="secondary-btn">ضبط</button>
+        </div>
+      </div>
+
+      <label class="checkbox-row">
+        <input id="startupCheckbox" type="checkbox" />
+        اجرای خودکار در استارتاپ ویندوز
+      </label>
+
+      <div class="settings-actions">
+        <button id="saveSettingsBtn" class="primary-btn">ذخیره</button>
+      </div>
+
+      <p id="settingsMsg" class="settings-msg hidden"></p>
+
+      <p class="dev-credit">توسعه‌دهنده: سوران اسمعیل‌پوری</p>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

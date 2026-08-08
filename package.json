@@ -1,0 +1,45 @@
+{
+  "name": "our-tasks",
+  "version": "1.0.0",
+  "description": "Our Tasks - quick data entry into Google Sheets via a global hotkey",
+  "main": "main.js",
+  "author": "Updesire",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis",
+    "pack": "electron-builder --win dir"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.updesire.ourtasks",
+    "productName": "Our Tasks",
+    "asar": true,
+    "files": [
+      "**/*",
+      "!google-apps-script/**",
+      "!README.md",
+      "!.github/**"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Our Tasks"
+    }
+  }
+}
