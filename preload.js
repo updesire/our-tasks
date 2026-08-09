@@ -6,5 +6,6 @@ contextBridge.exposeInMainWorld('api', {
   submitEntry: (entry) => ipcRenderer.invoke('submit-entry', entry),
   hideWindow: () => ipcRenderer.invoke('hide-window'),
   getAssignees: () => ipcRenderer.invoke('get-assignees'),
-  refreshAssignees: () => ipcRenderer.invoke('refresh-assignees')
+  getStats: () => ipcRenderer.invoke('get-stats'),
+  refreshData: () => ipcRenderer.invoke('refresh-data')
 });

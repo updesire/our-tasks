@@ -11,43 +11,60 @@
   <div class="app">
     <header class="topbar">
       <button id="settingsBtn" class="icon-btn" title="تنظیمات" aria-label="تنظیمات">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19.14 12.94a7.14 7.14 0 0 0 .06-.94 7.14 7.14 0 0 0-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54a7.3 7.3 0 0 0-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.14 7.14 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.42.32.6.22l2.39-.96c.5.4 1.05.71 1.63.94l.36 2.54c.05.24.25.42.5.42h3.84c.25 0 .45-.18.5-.42l.36-2.54a7.3 7.3 0 0 0 1.63-.94l2.39.96c.24.1.5 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5Z"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M19.14 12.94a7.14 7.14 0 0 0 .06-.94 7.14 7.14 0 0 0-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54a7.3 7.3 0 0 0-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.14 7.14 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.42.32.6.22l2.39-.96c.5.4 1.05.71 1.63.94l.36 2.54c.05.24.25.42.5.42h3.84c.25 0 .45-.18.5-.42l.36-2.54a7.3 7.3 0 0 0 1.63-.94l2.39.96c.24.1.5 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5Z"/></svg>
       </button>
-      <h1>Our Tasks</h1>
-      <span class="spacer"></span>
+      <h1>تسک های واحد نرم افزاری</h1>
     </header>
 
     <main class="card">
       <div class="field">
         <label for="nameInput">نام درخواست‌کننده</label>
-        <input id="nameInput" type="text" placeholder="مثلاً: علی رضایی" autocomplete="off" />
+        <input id="nameInput" type="text" placeholder="مثلاً: سوران" autocomplete="off" />
       </div>
 
-      <div class="field-row">
-        <div class="field">
-          <label for="assigneeSelect">مسئول اجرا</label>
-          <div class="hotkey-row">
-            <select id="assigneeSelect">
-              <option value="">— انتخاب کنید —</option>
-            </select>
-            <button id="refreshAssigneesBtn" type="button" class="secondary-btn" title="به‌روزرسانی لیست از گوگل شیت">↻</button>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="prioritySelect">اولویت</label>
-          <select id="prioritySelect">
-            <option value="کم">کم</option>
-            <option value="متوسط" selected>متوسط</option>
-            <option value="فوری">فوری</option>
+      <div class="field">
+        <label for="assigneeSelect">مسئول اجرا</label>
+        <div class="input-row">
+          <select id="assigneeSelect">
+            <option value="">— انتخاب کنید —</option>
           </select>
+          <button id="refreshAssigneesBtn" type="button" class="icon-btn ghost" title="به‌روزرسانی لیست از گوگل شیت">↻</button>
         </div>
       </div>
 
       <div class="field">
-        <label for="descInput">توضیحات</label>
-        <textarea id="descInput" rows="6" placeholder="توضیحات را اینجا بنویسید..."></textarea>
+        <label>اولویت</label>
+        <div class="priority-slider" id="prioritySlider">
+          <div class="priority-line"><div class="priority-line-fill" id="priorityFill"></div></div>
+          <div
+            class="priority-thumb"
+            id="priorityThumb"
+            tabindex="0"
+            role="slider"
+            aria-label="اولویت"
+            aria-valuemin="1"
+            aria-valuemax="5"
+            aria-valuenow="3"
+          >۳</div>
+        </div>
+        <div class="priority-scale-hint"><span>کم</span><span>زیاد</span></div>
       </div>
+
+      <div class="field">
+        <label for="descInput">توضیحات</label>
+        <textarea id="descInput" rows="4" placeholder="توضیحات را اینجا بنویسید..."></textarea>
+      </div>
+
+      <label class="status-row" id="statusRow">
+        <span class="status-text">
+          <span class="status-title">وضعیت اجرا</span>
+          <span class="status-value" id="statusValueText">انجام نشده</span>
+        </span>
+        <span class="switch">
+          <input type="checkbox" id="statusCheckbox" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+        </span>
+      </label>
 
       <button id="submitBtn" class="primary-btn">
         <span id="submitLabel">ثبت در گوگل شیت</span>
@@ -55,6 +72,32 @@
       </button>
 
       <p class="hint">کلید میانبر برای باز کردن این پنجره: <b id="hotkeyHint">…</b></p>
+
+      <div class="report">
+        <div class="report-ring">
+          <svg viewBox="0 0 120 120" width="92" height="92">
+            <circle cx="60" cy="60" r="52" class="ring-bg" />
+            <circle cx="60" cy="60" r="52" class="ring-progress" id="ringProgress" />
+          </svg>
+          <div class="ring-label">
+            <span id="ringPercent">0%</span>
+          </div>
+        </div>
+        <div class="report-stats">
+          <div class="report-stat">
+            <span class="report-stat-value" id="statTotal">۰</span>
+            <span class="report-stat-label">ثبت‌شده</span>
+          </div>
+          <div class="report-stat">
+            <span class="report-stat-value done" id="statDone">۰</span>
+            <span class="report-stat-label">انجام‌شده</span>
+          </div>
+          <div class="report-stat">
+            <span class="report-stat-value pending" id="statPending">۰</span>
+            <span class="report-stat-label">باقی‌مانده</span>
+          </div>
+        </div>
+      </div>
     </main>
 
     <div id="toast" class="toast hidden"></div>
@@ -65,8 +108,8 @@
     <div class="settings-panel">
       <div class="settings-header">
         <h2>تنظیمات</h2>
-        <button id="closeSettingsBtn" class="icon-btn" aria-label="بستن">
-          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.71 2.89 18.3 9.17 12 2.89 5.71 4.3 4.3l6.29 6.29 6.29-6.29z"/></svg>
+        <button id="closeSettingsBtn" class="icon-btn ghost" aria-label="بستن">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.71 2.89 18.3 9.17 12 2.89 5.71 4.3 4.3l6.29 6.29 6.29-6.29z"/></svg>
         </button>
       </div>
 
@@ -87,7 +130,7 @@
 
       <div class="field">
         <label>ترکیب کلید میانبر</label>
-        <div class="hotkey-row">
+        <div class="input-row">
           <input id="hotkeyInput" type="text" readonly placeholder="روی «ضبط» بزنید و کلیدها را فشار دهید" />
           <button id="recordBtn" class="secondary-btn">ضبط</button>
         </div>

@@ -8,7 +8,8 @@ A Windows app that opens with a global hotkey (default `Ctrl+Shift+Enter`), show
 - The app stays in the system tray (next to the clock) so the hotkey is always active.
 - It can be set to launch automatically when Windows starts.
 - Each user enters their own name once in Settings ("Recorder Name") so it's clear who submitted each row.
-- Every entry also has an **Assignee** (who's responsible for handling it, picked from a shared team list) and a **Priority** (Low / Medium / Urgent).
+- Every entry also has an **Assignee** (picked from a shared team list), a **Priority** from 1 to 5, and a **Status** (Done / Not done).
+- The main screen shows a small report at the bottom: a circular progress ring plus total / done / pending counts, read live from the Sheet.
 
 ---
 
@@ -27,10 +28,12 @@ A Windows app that opens with a global hotkey (default `Ctrl+Shift+Enter`), show
 
 On the first successful submission, the app automatically adds a header row in this order:
 
-| Recorder Name | Requester Name | Assignee | Priority | Description | Date | Time |
-|---|---|---|---|---|---|---|
+| Recorder Name | Requester Name | Assignee | Priority | Status | Description | Date | Time |
+|---|---|---|---|---|---|---|---|
 
 > Important: If you had previously deployed an older version of `Code.gs` (with different columns), make sure to create a new **New deployment** so the updated code runs. If your existing sheet has old columns, it's best to clear the sheet or start a new tab so the headers match the new layout.
+>
+> Also: the main data sheet (described above) must always be the **first tab** in your spreadsheet. Add the "اعضا" (Team) tab as a second/later tab, not the first.
 
 ### Team list for the "Assignee" dropdown
 
@@ -78,11 +81,14 @@ A ready-made workflow lives at `.github/workflows/build.yml`.
   - Change the hotkey by clicking **Record** and then pressing your desired key combination.
   - Enter the security code (if you set one in Apps Script).
   - Turn automatic startup with Windows on/off (default: on).
-- Filling in **Requester Name**, **Assignee**, **Priority**, and **Description**, then clicking **Submit to Google Sheet**, adds a new row in this order:
+- **Priority** is picked with five numbered buttons (1 to 5) — one click, no dropdown to open (default: 3).
+- **Status** is a simple on/off switch: defaults to "Not done"; turning it on records "Done" in the sheet.
+- Filling in **Requester Name**, **Assignee**, **Priority**, **Status**, and **Description**, then clicking **Submit to Google Sheet**, adds a new row in this order:
 
-  **Recorder Name | Requester Name | Assignee | Priority | Description | Date | Time**
+  **Recorder Name | Requester Name | Assignee | Priority | Status | Description | Date | Time**
 
-  "Recorder Name" is the value you entered in Settings (not your Windows username), and "Date"/"Time" are recorded automatically as two separate columns. "Assignee" is picked from the dropdown (fed by the "اعضا" tab); "Priority" defaults to Medium and can be set to Low / Medium / Urgent.
+  "Recorder Name" is the value you entered in Settings (not your Windows username), and "Date"/"Time" are recorded automatically as two separate columns.
+- The bottom of the main screen shows a small report: a circular progress ring for the percentage done, plus "Submitted" / "Done" / "Pending" counts. This is read live from the Sheet and refreshes via the **↻** button or whenever the window reopens.
 - Closing the window (×) only hides it; the app stays in the tray. To fully quit, right-click the tray icon and choose **Exit**.
 - The developer's name (Soran Esmaeilpouri) is shown at the bottom of the Settings window.
 

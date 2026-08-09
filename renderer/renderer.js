@@ -2,7 +2,12 @@
   const nameInput = document.getElementById('nameInput');
   const assigneeSelect = document.getElementById('assigneeSelect');
   const refreshAssigneesBtn = document.getElementById('refreshAssigneesBtn');
-  const prioritySelect = document.getElementById('prioritySelect');
+  const prioritySlider = document.getElementById('prioritySlider');
+  const priorityFill = document.getElementById('priorityFill');
+  const priorityThumb = document.getElementById('priorityThumb');
+  const statusRow = document.getElementById('statusRow');
+  const statusCheckbox = document.getElementById('statusCheckbox');
+  const statusValueText = document.getElementById('statusValueText');
   const descInput = document.getElementById('descInput');
   const submitBtn = document.getElementById('submitBtn');
   const submitLabel = document.getElementById('submitLabel');
@@ -26,6 +31,97 @@
   let pendingAccelerator = null;
   let isRecording = false;
   let toastTimer = null;
+  let selectedPriority = '3';
+
+  // ---------- Priority slider (۱ تا ۵، شبیه ولوم) ----------
+  // عدد ۱ = بالاترین اولویت (سمت چپ نوار)، عدد ۵ = کم‌ترین اولویت (سمت راست نوار)
+  const PRIORITY_EDGE = 17; // px inset matching .priority-thumb CSS
+
+  function priorityValueToFraction(value) {
+    return (value - 1) / 4; // ۱ → ۰ (چپ)، ۵ → ۱ (راست)
+  }
+
+  function applyPriorityVisual(fraction) {
+    fraction = Math.max(0, Math.min(1, fraction));
+    const width = prioritySlider.clientWidth;
+    const usable = Math.max(0, width - PRIORITY_EDGE * 2);
+    const px = PRIORITY_EDGE + fraction * usable;
+    priorityThumb.style.left = px + 'px';
+    // پر شدن خط برعکس موقعیت دسته است: هرچه به سمت ۱ (چپ) برویم خط پررنگ‌تر/پرتر می‌شود
+    priorityFill.style.width = ((1 - fraction) * 100) + '%';
+  }
+
+  function setPriority(value) {
+    value = Math.max(1, Math.min(5, Math.round(value)));
+    selectedPriority = String(value);
+    priorityThumb.textContent = toPersianDigits(value);
+    priorityThumb.setAttribute('aria-valuenow', String(value));
+    applyPriorityVisual(priorityValueToFraction(value));
+  }
+
+  function setPriorityFromClientX(clientX, snap) {
+    const rect = prioritySlider.getBoundingClientRect();
+    const usable = Math.max(1, rect.width - PRIORITY_EDGE * 2);
+    let fraction = (clientX - rect.left - PRIORITY_EDGE) / usable;
+    fraction = Math.max(0, Math.min(1, fraction));
+    const value = Math.max(1, Math.min(5, Math.round(1 + fraction * 4)));
+    selectedPriority = String(value);
+    priorityThumb.textContent = toPersianDigits(value);
+    priorityThumb.setAttribute('aria-valuenow', String(value));
+    // While dragging, follow the cursor exactly (smooth); on release, snap to the exact slot.
+    applyPriorityVisual(snap ? priorityValueToFraction(value) : fraction);
+  }
+
+  let draggingPriority = false;
+
+  prioritySlider.addEventListener('pointerdown', (e) => {
+    draggingPriority = true;
+    prioritySlider.classList.add('dragging');
+    prioritySlider.setPointerCapture(e.pointerId);
+    priorityThumb.focus();
+    setPriorityFromClientX(e.clientX, false);
+  });
+  prioritySlider.addEventListener('pointermove', (e) => {
+    if (draggingPriority) setPriorityFromClientX(e.clientX, false);
+  });
+  function endPriorityDrag(e) {
+    if (!draggingPriority) return;
+    draggingPriority = false;
+    prioritySlider.classList.remove('dragging');
+    if (e && typeof e.clientX === 'number') {
+      setPriorityFromClientX(e.clientX, true);
+    } else {
+      applyPriorityVisual(priorityValueToFraction(Number(selectedPriority)));
+    }
+  }
+  prioritySlider.addEventListener('pointerup', endPriorityDrag);
+  prioritySlider.addEventListener('pointercancel', endPriorityDrag);
+
+  priorityThumb.addEventListener('keydown', (e) => {
+    const current = Number(selectedPriority);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      setPriority(current - 1);
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      setPriority(current + 1);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      setPriority(1);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      setPriority(5);
+    }
+  });
+
+  // ---------- Status toggle (وضعیت اجرا) ----------
+  function setDone(done) {
+    statusCheckbox.checked = done;
+    statusValueText.textContent = done ? 'انجام شده' : 'انجام نشده';
+    statusRow.classList.toggle('done', done);
+  }
+
+  statusCheckbox.addEventListener('change', () => setDone(statusCheckbox.checked));
 
   function humanize(acc) {
     return (acc || '')
@@ -193,28 +289,57 @@
     populateAssignees(cached);
     // Refresh quietly in the background so the list stays current
     // without blocking the window from opening.
-    refreshAssignees(true);
+    refreshData(true);
   }
 
-  async function refreshAssignees(silent) {
+  async function refreshData(silent) {
     if (!silent) {
       refreshAssigneesBtn.disabled = true;
       refreshAssigneesBtn.classList.add('spinning');
     }
-    const result = await window.api.refreshAssignees();
+    const result = await window.api.refreshData();
     if (!silent) {
       refreshAssigneesBtn.disabled = false;
       refreshAssigneesBtn.classList.remove('spinning');
     }
     if (result.success) {
       populateAssignees(result.members);
-      if (!silent) showToast('لیست مسئولین به‌روزرسانی شد.', 'success');
+      renderStats(result.stats);
+      if (!silent) showToast('اطلاعات به‌روزرسانی شد.', 'success');
     } else if (!silent) {
-      showToast(result.message || 'به‌روزرسانی لیست ناموفق بود.', 'error');
+      showToast(result.message || 'به‌روزرسانی ناموفق بود.', 'error');
     }
   }
 
-  refreshAssigneesBtn.addEventListener('click', () => refreshAssignees(false));
+  refreshAssigneesBtn.addEventListener('click', () => refreshData(false));
+
+  // ---------- Report / stats ----------
+  const RING_CIRCUMFERENCE = 326.7;
+  const ringProgress = document.getElementById('ringProgress');
+  const ringPercent = document.getElementById('ringPercent');
+  const statTotal = document.getElementById('statTotal');
+  const statDone = document.getElementById('statDone');
+  const statPending = document.getElementById('statPending');
+
+  function toPersianDigits(n) {
+    const digits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    return String(n).replace(/[0-9]/g, (d) => digits[d]);
+  }
+
+  function renderStats(stats) {
+    const s = stats || { total: 0, done: 0, notDone: 0 };
+    const percent = s.total > 0 ? Math.round((s.done / s.total) * 100) : 0;
+    ringProgress.style.strokeDashoffset = String(RING_CIRCUMFERENCE * (1 - percent / 100));
+    ringPercent.textContent = toPersianDigits(percent) + '%';
+    statTotal.textContent = toPersianDigits(s.total);
+    statDone.textContent = toPersianDigits(s.done);
+    statPending.textContent = toPersianDigits(s.notDone);
+  }
+
+  async function loadStats() {
+    const cached = await window.api.getStats();
+    renderStats(cached);
+  }
 
   // ---------- Save settings ----------
   saveSettingsBtn.addEventListener('click', async () => {
@@ -244,7 +369,7 @@
       settingsMsg.textContent = 'تنظیمات ذخیره شد.';
       settingsMsg.className = 'settings-msg success';
       settingsMsg.classList.remove('hidden');
-      refreshAssignees(true);
+      refreshData(true);
       setTimeout(closeSettings, 900);
     } else {
       settingsMsg.textContent = result.message || 'ذخیره تنظیمات ناموفق بود.';
@@ -268,11 +393,14 @@
     submitLabel.textContent = 'در حال ارسال...';
     submitSpinner.classList.remove('hidden');
 
+    const wasDone = statusCheckbox.checked;
+
     const result = await window.api.submitEntry({
       name,
       description,
       assignee: assigneeSelect.value,
-      priority: prioritySelect.value
+      priority: selectedPriority,
+      done: wasDone
     });
 
     submitBtn.disabled = false;
@@ -284,8 +412,20 @@
       nameInput.value = '';
       descInput.value = '';
       assigneeSelect.value = '';
-      prioritySelect.value = 'متوسط';
+      setPriority('3');
+      setDone(false);
       nameInput.focus();
+
+      // Optimistic local update so the report feels instant, then
+      // reconcile with the sheet in the background.
+      const current = await window.api.getStats();
+      const next = {
+        total: (current.total || 0) + 1,
+        done: (current.done || 0) + (wasDone ? 1 : 0),
+        notDone: (current.notDone || 0) + (wasDone ? 0 : 1)
+      };
+      renderStats(next);
+      refreshData(true);
     } else {
       showToast(result.message || 'ثبت ناموفق بود.', 'error');
     }
@@ -297,6 +437,9 @@
     }
   });
 
+  setPriority(3);
+  setDone(false);
   loadSettings();
   loadAssignees();
+  loadStats();
 })();

@@ -24,7 +24,8 @@ function loadConfig() {
         secretToken: '',
         startAtLogin: true,
         submitterLabel: '',
-        assignees: []
+        assignees: [],
+        stats: { total: 0, done: 0, notDone: 0 }
       },
       parsed
     );
@@ -35,7 +36,8 @@ function loadConfig() {
       secretToken: '',
       startAtLogin: true,
       submitterLabel: '',
-      assignees: []
+      assignees: [],
+      stats: { total: 0, done: 0, notDone: 0 }
     };
   }
 }
@@ -49,7 +51,7 @@ function saveConfig(cfg) {
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 440,
-    height: 660,
+    height: 800,
     useContentSize: true,
     resizable: false,
     center: true,
@@ -314,7 +316,8 @@ ipcMain.handle('submit-entry', async (event, entry) => {
       token: cfg.secretToken || '',
       submittedBy: cfg.submitterLabel.trim(),
       assignee: (entry.assignee || '').trim(),
-      priority: entry.priority || ''
+      priority: entry.priority || '',
+      status: entry.done ? 'انجام شده' : 'انجام نشده'
     });
     return { success: true };
   } catch (err) {
@@ -327,7 +330,12 @@ ipcMain.handle('get-assignees', () => {
   return cfg.assignees || [];
 });
 
-ipcMain.handle('refresh-assignees', async () => {
+ipcMain.handle('get-stats', () => {
+  const cfg = currentConfig || loadConfig();
+  return cfg.stats || { total: 0, done: 0, notDone: 0 };
+});
+
+ipcMain.handle('refresh-data', async () => {
   const cfg = currentConfig || loadConfig();
   if (!cfg.webhookUrl) {
     return { success: false, message: 'ابتدا آدرس وب‌هوک را از تنظیمات وارد کنید.' };
@@ -341,11 +349,19 @@ ipcMain.handle('refresh-assignees', async () => {
       throw new Error('پاسخ نامعتبر از Apps Script دریافت شد.');
     }
     const members = Array.isArray(parsed.members) ? parsed.members : [];
+    const stats = parsed.stats && typeof parsed.stats === 'object'
+      ? {
+          total: Number(parsed.stats.total) || 0,
+          done: Number(parsed.stats.done) || 0,
+          notDone: Number(parsed.stats.notDone) || 0
+        }
+      : { total: 0, done: 0, notDone: 0 };
     cfg.assignees = members;
+    cfg.stats = stats;
     saveConfig(cfg);
-    return { success: true, members };
+    return { success: true, members, stats };
   } catch (err) {
-    return { success: false, message: 'به‌روزرسانی لیست ناموفق بود: ' + err.message };
+    return { success: false, message: 'به‌روزرسانی اطلاعات ناموفق بود: ' + err.message };
   }
 });
 
