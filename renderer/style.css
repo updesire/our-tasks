@@ -76,10 +76,10 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.card::-webkit-scrollbar { width: 6px; }
-.card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 6px; }
+.card::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 .field {
   margin-bottom: 14px;
@@ -435,7 +435,10 @@ body {
   box-shadow: 0 24px 60px rgba(0,0,0,0.6);
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.settings-panel::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 .settings-header {
   display: flex;

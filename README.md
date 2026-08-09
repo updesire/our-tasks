@@ -87,7 +87,7 @@ A ready-made workflow lives at `.github/workflows/build.yml`.
 
   **Recorder Name | Requester Name | Assignee | Priority | Status | Description | Date | Time**
 
-  "Recorder Name" is the value you entered in Settings (not your Windows username), and "Date"/"Time" are recorded automatically as two separate columns.
+  "Recorder Name" is the value you entered in Settings (not your Windows username), and "Date"/"Time" are recorded automatically as two separate columns. The date is written in the Persian (Jalali/Shamsi) calendar, e.g. `۱۴۰۵/۰۵/۱۸`.
 - The bottom of the main screen shows a small report: a circular progress ring for the percentage done, plus "Submitted" / "Done" / "Pending" counts. This is read live from the Sheet and refreshes via the **↻** button or whenever the window reopens.
 - Closing the window (×) only hides it; the app stays in the tray. To fully quit, right-click the tray icon and choose **Exit**.
 - The developer's name (Soran Esmaeilpouri) is shown at the bottom of the Settings window.
