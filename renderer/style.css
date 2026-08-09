@@ -71,6 +71,18 @@ body {
   gap: 6px;
 }
 
+.field-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.field-row .field {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
 .field label {
   font-size: 13px;
   font-weight: 600;
@@ -108,7 +120,8 @@ body {
 #refreshAssigneesBtn {
   flex: 0 0 auto;
   font-size: 16px;
-  padding: 0 14px;
+  padding: 0 10px;
+  min-width: 34px;
 }
 #refreshAssigneesBtn.spinning {
   animation: spin .7s linear infinite;

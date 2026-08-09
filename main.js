@@ -49,7 +49,8 @@ function saveConfig(cfg) {
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 440,
-    height: 600,
+    height: 660,
+    useContentSize: true,
     resizable: false,
     center: true,
     show: false,
