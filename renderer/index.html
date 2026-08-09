@@ -24,6 +24,25 @@
       </div>
 
       <div class="field">
+        <label for="assigneeSelect">مسئول اجرا</label>
+        <div class="hotkey-row">
+          <select id="assigneeSelect">
+            <option value="">— انتخاب کنید —</option>
+          </select>
+          <button id="refreshAssigneesBtn" type="button" class="secondary-btn" title="به‌روزرسانی لیست از گوگل شیت">↻</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="prioritySelect">اولویت</label>
+        <select id="prioritySelect">
+          <option value="کم">کم</option>
+          <option value="متوسط" selected>متوسط</option>
+          <option value="فوری">فوری</option>
+        </select>
+      </div>
+
+      <div class="field">
         <label for="descInput">توضیحات</label>
         <textarea id="descInput" rows="6" placeholder="توضیحات را اینجا بنویسید..."></textarea>
       </div>
@@ -55,8 +74,8 @@
       </div>
 
       <div class="field">
-        <label for="tokenInput">کد امنیتی (اختیاری)</label>
-        <input id="tokenInput" type="text" placeholder="اختیاری" autocomplete="off" />
+        <label for="tokenInput">کد امنیتی</label>
+        <input id="tokenInput" type="text" placeholder="کد امنیتی" autocomplete="off" />
       </div>
 
       <div class="field">

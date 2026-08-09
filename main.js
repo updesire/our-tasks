@@ -23,7 +23,8 @@ function loadConfig() {
         webhookUrl: '',
         secretToken: '',
         startAtLogin: true,
-        submitterLabel: ''
+        submitterLabel: '',
+        assignees: []
       },
       parsed
     );
@@ -33,7 +34,8 @@ function loadConfig() {
       webhookUrl: '',
       secretToken: '',
       startAtLogin: true,
-      submitterLabel: ''
+      submitterLabel: '',
+      assignees: []
     };
   }
 }
@@ -247,6 +249,16 @@ function followGet(targetUrl, maxRedirects) {
   });
 }
 
+function getJson(targetUrl) {
+  let urlObj;
+  try {
+    urlObj = new URL(targetUrl);
+  } catch (e) {
+    return Promise.reject(new Error('آدرس وب‌هوک نامعتبر است.'));
+  }
+  return followGet(urlObj.toString(), 5);
+}
+
 // ---------- IPC ----------
 ipcMain.handle('get-settings', () => {
   const cfg = currentConfig || loadConfig();
@@ -299,11 +311,40 @@ ipcMain.handle('submit-entry', async (event, entry) => {
       name: entry.name.trim(),
       description: (entry.description || '').trim(),
       token: cfg.secretToken || '',
-      submittedBy: cfg.submitterLabel.trim()
+      submittedBy: cfg.submitterLabel.trim(),
+      assignee: (entry.assignee || '').trim(),
+      priority: entry.priority || ''
     });
     return { success: true };
   } catch (err) {
     return { success: false, message: 'ارسال به گوگل شیت ناموفق بود: ' + err.message };
+  }
+});
+
+ipcMain.handle('get-assignees', () => {
+  const cfg = currentConfig || loadConfig();
+  return cfg.assignees || [];
+});
+
+ipcMain.handle('refresh-assignees', async () => {
+  const cfg = currentConfig || loadConfig();
+  if (!cfg.webhookUrl) {
+    return { success: false, message: 'ابتدا آدرس وب‌هوک را از تنظیمات وارد کنید.' };
+  }
+  try {
+    const raw = await getJson(cfg.webhookUrl);
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      throw new Error('پاسخ نامعتبر از Apps Script دریافت شد.');
+    }
+    const members = Array.isArray(parsed.members) ? parsed.members : [];
+    cfg.assignees = members;
+    saveConfig(cfg);
+    return { success: true, members };
+  } catch (err) {
+    return { success: false, message: 'به‌روزرسانی لیست ناموفق بود: ' + err.message };
   }
 });
 

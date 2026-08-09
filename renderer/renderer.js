@@ -1,5 +1,8 @@
 (function () {
   const nameInput = document.getElementById('nameInput');
+  const assigneeSelect = document.getElementById('assigneeSelect');
+  const refreshAssigneesBtn = document.getElementById('refreshAssigneesBtn');
+  const prioritySelect = document.getElementById('prioritySelect');
   const descInput = document.getElementById('descInput');
   const submitBtn = document.getElementById('submitBtn');
   const submitLabel = document.getElementById('submitLabel');
@@ -163,6 +166,56 @@
     }
   });
 
+  // ---------- Assignees (مسئول اجرا) ----------
+  function populateAssignees(members, preserveValue) {
+    const previousValue = preserveValue !== undefined ? preserveValue : assigneeSelect.value;
+    assigneeSelect.innerHTML = '';
+
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = '— انتخاب کنید —';
+    assigneeSelect.appendChild(placeholder);
+
+    (members || []).forEach((name) => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      assigneeSelect.appendChild(opt);
+    });
+
+    if (previousValue && members && members.includes(previousValue)) {
+      assigneeSelect.value = previousValue;
+    }
+  }
+
+  async function loadAssignees() {
+    const cached = await window.api.getAssignees();
+    populateAssignees(cached);
+    // Refresh quietly in the background so the list stays current
+    // without blocking the window from opening.
+    refreshAssignees(true);
+  }
+
+  async function refreshAssignees(silent) {
+    if (!silent) {
+      refreshAssigneesBtn.disabled = true;
+      refreshAssigneesBtn.classList.add('spinning');
+    }
+    const result = await window.api.refreshAssignees();
+    if (!silent) {
+      refreshAssigneesBtn.disabled = false;
+      refreshAssigneesBtn.classList.remove('spinning');
+    }
+    if (result.success) {
+      populateAssignees(result.members);
+      if (!silent) showToast('لیست مسئولین به‌روزرسانی شد.', 'success');
+    } else if (!silent) {
+      showToast(result.message || 'به‌روزرسانی لیست ناموفق بود.', 'error');
+    }
+  }
+
+  refreshAssigneesBtn.addEventListener('click', () => refreshAssignees(false));
+
   // ---------- Save settings ----------
   saveSettingsBtn.addEventListener('click', async () => {
     settingsMsg.classList.add('hidden');
@@ -191,6 +244,7 @@
       settingsMsg.textContent = 'تنظیمات ذخیره شد.';
       settingsMsg.className = 'settings-msg success';
       settingsMsg.classList.remove('hidden');
+      refreshAssignees(true);
       setTimeout(closeSettings, 900);
     } else {
       settingsMsg.textContent = result.message || 'ذخیره تنظیمات ناموفق بود.';
@@ -214,7 +268,12 @@
     submitLabel.textContent = 'در حال ارسال...';
     submitSpinner.classList.remove('hidden');
 
-    const result = await window.api.submitEntry({ name, description });
+    const result = await window.api.submitEntry({
+      name,
+      description,
+      assignee: assigneeSelect.value,
+      priority: prioritySelect.value
+    });
 
     submitBtn.disabled = false;
     submitLabel.textContent = 'ثبت در گوگل شیت';
@@ -224,6 +283,8 @@
       showToast('با موفقیت ثبت شد ✅', 'success');
       nameInput.value = '';
       descInput.value = '';
+      assigneeSelect.value = '';
+      prioritySelect.value = 'متوسط';
       nameInput.focus();
     } else {
       showToast(result.message || 'ثبت ناموفق بود.', 'error');
@@ -237,4 +298,5 @@
   });
 
   loadSettings();
+  loadAssignees();
 })();

@@ -1,10 +1,13 @@
 * { box-sizing: border-box; }
-
+@font-face {
+  font-family: yekan;
+  src: url(../assets/YekanBakhFaNum-Regular.woff);
+}
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-family: yekan, Tahoma, sans-serif;
   overflow: hidden;
 }
 
@@ -75,12 +78,13 @@ body {
 }
 
 .field input[type="text"],
-.field textarea {
+.field textarea,
+.field select {
   border: 1.5px solid #e2def7;
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 14px;
-  font-family: inherit;
+  font-family: yekan, Tahoma, sans-serif;
   color: #241f36;
   background: #fbfaff;
   outline: none;
@@ -88,10 +92,26 @@ body {
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 
+.field select {
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
 .field input[type="text"]:focus,
-.field textarea:focus {
+.field textarea:focus,
+.field select:focus {
   border-color: #6D5DF6;
   box-shadow: 0 0 0 3px rgba(109,93,246,0.15);
+}
+
+#refreshAssigneesBtn {
+  flex: 0 0 auto;
+  font-size: 16px;
+  padding: 0 14px;
+}
+#refreshAssigneesBtn.spinning {
+  animation: spin .7s linear infinite;
 }
 
 .primary-btn {
@@ -110,6 +130,7 @@ body {
   gap: 8px;
   box-shadow: 0 8px 18px rgba(109,93,246,0.35);
   transition: transform .1s ease, box-shadow .15s ease;
+  font-family: yekan, Tahoma, sans-serif;
 }
 .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(109,93,246,0.45); }
 .primary-btn:active { transform: translateY(0); }
@@ -125,6 +146,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  font-family: yekan, Tahoma, sans-serif;
 }
 .secondary-btn.recording {
   background: #ff5e5e;
