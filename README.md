@@ -8,6 +8,7 @@ A Windows app that opens with a global hotkey (default `Ctrl+Shift+Enter`), show
 - The app stays in the system tray (next to the clock) so the hotkey is always active.
 - It can be set to launch automatically when Windows starts.
 - Each user enters their own name once in Settings ("Recorder Name") so it's clear who submitted each row.
+- Every entry also has an **Assignee** (who's responsible for handling it, picked from a shared team list) and a **Priority** (Low / Medium / Urgent).
 
 ---
 
@@ -26,10 +27,18 @@ A Windows app that opens with a global hotkey (default `Ctrl+Shift+Enter`), show
 
 On the first successful submission, the app automatically adds a header row in this order:
 
-| Recorder Name | Requester Name | Description | Date | Time |
-|---|---|---|---|---|
+| Recorder Name | Requester Name | Assignee | Priority | Description | Date | Time |
+|---|---|---|---|---|---|---|
 
-> Important: If you had previously deployed an older version of `Code.gs` (with different columns, like "Computer"), make sure to create a new **New deployment** so the updated code runs. If your existing sheet has old columns, it's best to clear the sheet or start a new tab so the headers match the new layout.
+> Important: If you had previously deployed an older version of `Code.gs` (with different columns), make sure to create a new **New deployment** so the updated code runs. If your existing sheet has old columns, it's best to clear the sheet or start a new tab so the headers match the new layout.
+
+### Team list for the "Assignee" dropdown
+
+The **Assignee** field in the app is a dropdown, populated from a roster you maintain directly in the same Google Sheet — no app rebuild needed when your team changes.
+
+1. In your Google Sheet, add a new tab and name it exactly **اعضا**.
+2. In column A of that tab, list one team member's name per row (no header needed).
+3. Whenever you add or remove someone, the app picks up the change automatically the next time it fetches the list, or immediately if you click the **↻** refresh button next to the Assignee dropdown.
 
 ---
 
@@ -69,11 +78,11 @@ A ready-made workflow lives at `.github/workflows/build.yml`.
   - Change the hotkey by clicking **Record** and then pressing your desired key combination.
   - Enter the security code (if you set one in Apps Script).
   - Turn automatic startup with Windows on/off (default: on).
-- Filling in **Requester Name** and **Description** and clicking **Submit to Google Sheet** adds a new row in this order:
+- Filling in **Requester Name**, **Assignee**, **Priority**, and **Description**, then clicking **Submit to Google Sheet**, adds a new row in this order:
 
-  **Recorder Name | Requester Name | Description | Date | Time**
+  **Recorder Name | Requester Name | Assignee | Priority | Description | Date | Time**
 
-  "Recorder Name" is the value you entered in Settings (not your Windows username), and "Date"/"Time" are recorded automatically as two separate columns.
+  "Recorder Name" is the value you entered in Settings (not your Windows username), and "Date"/"Time" are recorded automatically as two separate columns. "Assignee" is picked from the dropdown (fed by the "اعضا" tab); "Priority" defaults to Medium and can be set to Low / Medium / Urgent.
 - Closing the window (×) only hides it; the app stays in the tray. To fully quit, right-click the tray icon and choose **Exit**.
 - The developer's name (Soran Esmaeilpouri) is shown at the bottom of the Settings window.
 
